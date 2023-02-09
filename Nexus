@@ -1,0 +1,318 @@
+Artifactory Repository/Tools
+----------------------------
+Nexus/ Sonartype Nexus
+JFrog Artifactory
+
+Nexus/ Sonartype Nexus
+----------------------
+Nexus is a Open Source, Java based artifactory repository manager tool. Nexus software developed using Java language.
+Nexus is used to store the build artifacts as well as retrive the build artifacts whenever we require.
+By default, Nexus listens on port 8081
+
+Just like github we also create repository in nexus to store the artifacts/package(.jar, .war, .ear)
+
+In the real-time we create on docker registory in nexus and store our custom docker images. 
+
+What is diff b/w GitHub and Nexus?
+GitHub is a SCM,  used to store the code as well as retrive the code whenever we require.
+Nexus is a Open Source, Java based artifactory repository manager tool, 
+used to store the build artifacts as well as retrive the build artifacts whenever we require.
+
+Nexus Directory Structure
+--------------------------
+bin : Contains binary files eg.nexus.rc, nexus
+---
+etc : Contains configuration files eg.nexus-default.properties
+---
+
+Nexus Installation in Linux
+---------------------------
+Prerequisites
+At least 2GB of RAM
+Java 8 or 11 (JER) is the pre-requisite Software for SonarQube server based on version.
+
+Launch linux EC2 with SSH(22) and Nexus(8081) port.
+Login as a root user and update server
+$ sudo su -
+# yum update -y
+
+Instal Java, wget, tar and vim
+# yum install java-1.8* wget tar vim -y
+
+To check jre version
+# java -version  
+
+Change directory 
+# cd /opt
+
+Download Nexus
+# wget https://download.sonatype.com/nexus/3/nexus-3.45.0-01-unix.tar.gz
+
+Unzip Nexus
+# tar -zxvf nexus-3.45.0-01-unix.tar.gz
+
+Rename Nexus
+# mv nexus-3.45.0-01 nexus
+
+Remove Nexus zip file
+# rm -rf nexus-3.45.0-01-unix.tar.gz
+
+As a good security practice, Nexux Server is not advised to run nexus service as a root user,
+so create a new user called nexus user and grant sudo access to manage nexus services as follows.
+# useradd nexus
+
+Give the sudo access to nexus user
+# vim /etc/sudoers
+nexus   ALL=(ALL)       NOPASSWD: ALL
+
+Change the owner and group permissions to /opt/nexus and /opt/sonatype-work directories.
+# chown -R nexus:nexus /opt/nexus
+# chown -R nexus:nexus /opt/sonatype-work
+# chmod -R 775 /opt/nexus
+# chmod -R 775 /opt/sonatype-work
+
+Open /opt/nexus/bin/nexus.rc file and uncomment run_as_user parameter and set as nexus user.
+# vim /opt/nexus/bin/nexus.rc
+run_as_user="nexus"
+
+OR
+
+echo 'run_as_user="nexus"' > /opt/nexus/bin/nexus.rc
+
+Create nexus as a service
+# ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
+
+Switch as a nexus user and start the nexus service as follows.
+# sudo su - nexus
+
+Enable the nexus services
+# sudo systemctl enable nexus
+# sudo systemctl is-enabled nexus
+
+Start the nexus service
+# sudo systemctl start nexus
+# sudo systemctl status nexus
+
+User Name : admin
+Password : Rahul@3738
+
+Access the Nexus server from Laptop/Desktop browser.
+
+http://IPAddess/:8081/      -->  Nexus 3.x
+http://IPAddess/:8081/nexus -->  Nexus 2.x
+
+If you have to restrict the browse section or nexus directory to after login then login as administrative user and disable anonymous access in settings. 
+
+Lab
+---
+
+My requirement is to change port number from 8081 --> 8082 and context path from http://IPAddess/:8081/ --> http://IPAddess/:8081/rahul .
+Edit the nexus-default.properties configuration file and change below parameter. After changes restart the nexus service.
+# vim /opt/nexus/etc/nexus-default.properties
+
+application-port=8082
+nexus-context-path=/rahul
+
+# sudo systemctl restart nexus
+
+Now access nexus with http://IPAddess/:8082/rahul 
+
+Just like github we also create a repository in nexus to store the artifacts/package(.jar, .war, .ear).
+
+maven2(hosted)
+--------------
+To create repository login as administrative user.
+
+To deploy on going devlopment deployment we use snapshot repository.
+
+Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
+Select Recipe maven2(hosted) --> Provide repository name as project name(facebook-snapshot) --> select version policy as snapshot --> click on create
+
+http://3.110.189.243:8082/rahul/repository/facebook-snapshot/
+
+To deploy on going production deployment we use releases repository.
+
+Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
+Select Recipe maven2(hosted) --> Provide repository name as project name(facebook-release) --> click on create
+
+http://3.110.189.243:8082/rahul/repository/facebook-release/
+
+Note : As a devops engineer we are responsible to create above two repository when a new project is onboarded.
+
+If you have check content inside repository
+Click on browse server contents next to settings tab --> Click on browse tab left hand side --> Click on repository
+
+In Real-time we configure nexus repository url in pom.xml under below tag.
+
+	<distributionManagement>
+
+            <repository>
+              <id>nexus</id>     --> any id name you can give
+              <name>Rahul Technologies Releases Nexus Repository</name>
+              <url>http://3.110.189.243:8082/rahul/repository/facebook-release/</url>
+            </repository>
+
+            <snapshotRepository>
+              <id>nexus</id>      --> any id name you can give
+              <name>Rahul Technologies Snapshot Nexus Repository </name>
+              <url>http://3.110.189.243:8082/rahul/repository/facebook-shapshot/</url>
+            </snapshotRepository>
+
+	</distributionManagement>
+
+In Real-time we configure nexus credentional in settings.xml of mavan as follow.
+
+<servers>
+
+	<server>
+	  <id>nexus</id>   --> any id name you can give
+	  <username>admin</username>
+        <password>Rahul@3738</password>
+	</server>
+
+</servers>
+
+
+Note : pom.xml id and settings.xml file id should be same.
+
+
+Now run # mvn clean deploy in /root/java-projects/maven-web-application to deploy artifact to nexus repository
+
+
+If you get 400 Repository does not allow updating assets Please check release version in pom.xml
+If you get 401 unauthorized error while deploy please check credentials in setting.xml
+If you get 403 forbidden error while deploy please check user access.
+
+If you want to overwrite the previous release version with a new release.
+Click on settings tab --> Click on Repository tab left hand side --> Click on release repository of your project 
+--> select deployment policy as Allow redeploy --> click on save 
+
+After your work is done please make it to disable redeploy.
+
+--------------------------------------------------------------------------------------------------------------------------
+Senario : In my project we have developed 10 jar file and we need to use this jar within our company only.
+-------   In such case as a devops engineer we create on remote repository in nexus and upload those jar file and share url with devlopmet team.
+          so they can update this url and dependancy in pom.xml
+
+Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
+Select Recipe maven2(hosted) --> Provide repository name as (rss-remote-repo) --> select version policy as mixed --> click on create
+
+http://65.2.123.210:8082/rahul/repository/rss-remote-repo/
+
+To upload the jar 
+-----------------
+Click on browse server contents next to settings tab --> Click on browse tab left hand side --> Click on repository --> Click on Upload
+Browse jar --> Provide Group ID (com.rss) --> Artifact ID (mail) --> Version(1.0.0) --> Click on Upload
+
+Configure Remote Repository url and dependacny in pom.xml
+	
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>RSS Remote Repository</name>
+			<url>http://65.2.123.210:8082/rahul/repository/rss-remote-repo/</url>
+		</repository>
+	</repositories>
+
+	<dependencies>
+
+		<dependency>
+  			<groupId>com.rss</groupId>
+  			<artifactId>mail</artifactId>
+  			<version>1.0.0</version>
+		</dependency>
+
+	</dependencies>
+
+Do below changes in mh/conf/settings.xml
+	
+	<mirror>
+		<id>nexus</id>
+		<mirrorOf>external:http:*</mirrorOf>
+		<name>RSS Remote Repository</name>
+      	<url>http://65.2.123.210:8082/rahul/repository/rss-remote-repo/</url>
+	</mirror>
+
+
+
+maven2(proxy)
+-------------
+In real-time we do not download dependency directly from maven central to local.we download dependency from maven central to remote repository.
+For this purpose we create on maven2(proxy) remote repository in nexus server.
+
+Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
+Select Recipe maven2(proxy) --> Provide repository name as (rss-proxy-repo) --> select version policy as mixed -->
+Provide maven central repo url --> select authentication check box and provide credentials if requred --> click on create
+
+http://65.2.123.210:8082/rahul/repository/rss-proxy-repo/
+
+Configure Proxy Repository url in pom.xml as follows.
+
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>RSS Proxy Repository</name>
+			<url>http://65.2.123.210:8082/rahul/repository/rss-proxy-repo/</url>
+		</repository>
+	</repositories>
+
+Configure Proxy Repository url in  mh/conf/settings.xml as follows.
+
+	<mirror>
+		<id>nexus</id>
+		<mirrorOf>external:http:*</mirrorOf>
+		<name>RSS Proxy Repository</name>
+      	<url>http://65.2.123.210:8082/rahul/repository/rss-proxy-repo/</url>
+	</mirror>
+
+
+maven2(group)
+-------------
+In real-time we maintain remote repository maven2(proxy) for maven dependancy and remote repository maven2(hosted) for jar dependancy 
+but we can't mention both repository url in pom.xml and mh/conf/setting.xml at the same time.
+
+For the use of both repository we create on maven2(group) repository in nexus server and add above both/multiple repository in maven2(group).
+
+Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
+Select Recipe maven2(group) --> Provide repository name as (rss-group-repo) --> select version policy as mixed -->
+add member repo (In our case rss-proxy-repo and rss-remote-repo) --> click on create
+
+http://65.2.123.210:8082/rahul/repository/rss-group-repo/
+
+Configure Group Repository url in pom.xml as follows.
+
+	<repositories>
+		<repository>
+			<id>nexus</id>
+			<name>RSS Group Repository</name>
+			<url>http://3.6.189.144:8081/repository/rss-group-repo/</url>
+		</repository>
+	</repositories>
+
+Configure Group Repository url in mh/conf/settings.xml as follows.
+
+	<mirror>
+		<id>nexus</id>
+		<mirrorOf>external:http:*</mirrorOf>
+		<name>RSS Group Repository</name>
+      	<url>http://65.2.123.210:8082/rahul/repository/rss-group-repo/</url>
+	</mirror>
+
+
+Note : In Real-time we configure group repository url only and add other repository in group repository.
+
+Nexus Admin Task
+----------------
+Repository
+
+Cleanup policy
+Cleanup policies can be used to remove content from your repositories
+We can create clean up policy and attach to repository of our choise.
+
+We can create rolls in security tab.
+Roles bring together multiple privileges so that, when you assign a user to the role, that user will automatically have all of those privileges
+We can create users and attche rolls to user in security tab.
+
+LDAP : lightweight directory access protocol or AD : active directory
+LDAP or AD server contain employee informetion
+We can integrate LDAP or AD with SonarQube, Nexus and Jenkins so we no need to create user manually
