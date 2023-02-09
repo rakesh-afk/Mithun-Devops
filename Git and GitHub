@@ -1,0 +1,560 @@
+GitHub Credential
+------------------
+UserName : Rahul3738
+Password : Rahul@3738
+
+
+Source Code Management Tools
+----------------------------
+github
+gitlab
+bitbucket
+SVN
+CVS
+TFS
+
+Git is a distributed version control system.
+GitHub is a centralized repository or remote repository or storage.
+
+Note : In real-time we are going to use the enterprise edition of github.
+
+As a devops engineer we are responsible to do admin activity as follows when a new project is onboarded.
+
+1. As a devops engineer we are responsible to create an organization(it is like a boundary) so that outsiders can not access our code.
+
+organization url : https://github.com/rahulss-ec-project
+
+2. As a devops engineer we are responsible to create a repository in scm for each project with project name and share the repository url
+with the development team. Repository is the place where we store the code.
+
+repository url : https://github.com/rahulss-ec-project/facebook.git
+                 https://github.com/rahulss-ec-project/amazon.git
+       
+Note : In the real-time we are going to create a private repository.
+
+3. As a devops engineer we are responsible to create a team(groupe), add resources(developer) to the team and provide repository access to the team.
+So that developer can't access code from other repository projects.
+
+team url : https://github.com/orgs/rahulss-ec-project/teams/facebook-devteam
+
+Note: Based on requirement we can create n numbers of repositories for the same project.
+
+Git Commands
+------------
+
+Note : In real-time mostly we download git bash in windows.
+
+Create a Linux EC2 instance with an SSH port.
+
+Update EC2 Instance.
+# yum update -y.
+
+Install git package.
+# yum install git -y.
+
+Create a director with a Project name.
+# mkdir facebook
+
+Change directory to facebook.
+# cd facebook
+
+Run the git init command(git initialize) inside the facebook director.
+#git init
+
+As soon as you run # git init command directory will be converted into empty git local repository,
+One hidden directory will created with name .git which is nothing but a empty git local repository,
+and directory converted into three different logical areas or stages which you cannot see.
+
+Provide any username and mail ID using the following command brefore FIRST COMMIT.
+# git config --global use.name "rahul3738"
+# git config --global user.email "rahul@gmail.com"
+
+To see username and mail ID use following command
+# git config --global --list
+
+
+Working Area/Untracked file        
+---------------------------
+By Default file is created in the working area.
+You can write and update the file in the working area.
+If you create the file,update the file by default the file is available in the working area.
+
+If you want to check the status of a file using the following command.
+# git status
+
+Untracked file (In Red Color)
+
+Once development is completed we are going to move files from the working area to staging area.
+To move code from the working area to the staging area is called add.
+
+# git add .  --> move all file
+# git add *  --> move all file
+# git add *.java  --> move file only having .java extension
+# git add myfile1  --> move only specific file
+         
+Staging Area           
+------------            
+
+If you want to check the status of the file using the following command.
+# git status
+
+Changes to be committed (file is in staging area file name with green color)
+
+Move code from Staging area to local repository process of moving code to local repository is called as commit.
+
+# git commit -m "any message you can give" --> move all file
+# git commit -m "My first commit of myfile1" myfile1 --> move only specific file
+
+Local Repository
+----------------
+
+If you want to check the status of file using following command
+# git status
+
+To Move code from git local repository to github remote repository is called as push.
+But before push code to github remote repository, make sure that you are connected to github remote repository.
+
+To check github connection
+# git remote -v
+
+To connect github remote repository to git local repository is called as add.
+# git remote add facebook https://github.com/rahulss-ec-project/facebook.git
+
+Here facebook is an alias name to github remote repository url,you can use any name eg.project name.
+
+To Move code from git local repository to github remote repository
+# git push facebook master
+
+Here master is the github remote repository branch name where we are moving our code from git local repository master branch.
+
+If you modify any already commited file and you want to add and commit the file at same time use below command
+# git commit -a -m "updated..."
+
+What is the command to check how many commits you did in the local repository? or to check username, mail ID, date, time and commit msg
+# git log
+
+To see recent commit
+# git log -1 
+
+To see last two recent commit
+# git log -2
+
+To see all commit in one line
+# git log --oneline
+
+To check one perticular commit ID or to check data inside that file
+# git show <Commit id>
+
+To check file name in perticular commit ID
+# git show --pretty="" --name-only <Commit id>
+
+To search a particular commit containing the below word in a comment then use the following command.
+# git log --grep "London"
+
+Git reset
+---------
+After moving the file to the staging area if you want to undo/remove file from Staging area then we go for the reset concept.
+Reset concept work after add and before commit.
+
+# git reset .  --> remove all
+# git reset *  --> remove all
+# git reset *.java   --> remove file only having .java extension
+# git reset myfile1  --> remove only specific file
+
+To remove file from both Working area as well as Staging area use below command
+
+# git reset --hard .  --> remove all
+# git reset --hard *  --> remove all
+# git reset --hard *.java   --> remove file only having .java extension
+# git reset --hard myfile1  --> remove only specific file
+
+Git revert
+----------
+Revert concept work after commit.
+
+Scenario: You have created test.py and test.cs files and also modified the already commited file Deploy.sh.
+          changes are pushed to github remote repository.Due to your push build failing.
+          Now you have to remove test.py and test.cs and undo the changes from Deploy.sh.
+ 
+          In such cases we go for the git revert concept.
+
+# git revert <CI>
+
+After running above command in your local repository.
+ deploy.sh updated code removed
+ delete test.cs
+ delete test.py
+Now push changes to github remote repository
+# git push facebook master -f
+
+How to remove an untracked file?
+--------------------------------
+Untracked file = file not being added to staging area and committed in local repository is called an untracked file.
+Or file is only present in workspace.
+
+To list untracked files
+# git clean -n
+
+To remove all untracked files
+# git clean -f
+
+To remove Specific untracked file
+# git clean -f myfile10
+
+Git Ignore Files
+----------------
+Sometimes we don't want to commit files, which are generated by IDE like .project and.classpath
+or node module folders like node_modules into a git remote repository.
+To ignore these files and the folder to commit we will create one hidden file called .gitignore and
+we will keep those files and directory names which we don't want to commit.
+
+# vim .gitignore
+.project
+.classpath
+/node_modules
+
+# git add . .gitignore
+# git commit -m "ignored files and folders"
+# git push facebook master
+
+Branches
+--------
+Branch concept is useful for parallel development.
+You can create any number of branches.
+master/main is default branch.
+
+To see a local repository branch name use following command
+# git branch
+
+To see a remote repository branch use of following command
+# git branch -r
+
+To see a local as well as remote repository branch use of following command
+# git branch -a
+
+To create new branch use following command
+# git branch development
+
+Note : * represent your current branch
+
+To switch branch use following command
+# git checkout development
+
+To create new branch and To switch branch at same time use following command
+# git checkout -b stage
+
+If you create a new file or modify any file in your new branch and forget to add and commit then,
+that file or changes are visible in each and every other branch until you commit that file in your new branch.
+
+Note: Working area is common for both master and development branch
+
+File created or modified in the working area will be visible in any of the branch working areas until you commit that file.
+Once you commit that file then that file belong to that particular branch.
+
+You should not switch to another branch unless you commit your work in the current branch.
+
+Branch Merging
+--------------
+It is a pull mechanism or copy paste mechanism. Being present in one branch copy and paste the data of another branch or vice versa.
+
+eg. development branch merging with master branch.
+
+To merge branch use following command
+# git merge development
+
+Here being present in master branch copy and paste development branch data.
+
+When you are having the same file name in both branches and different data inside those files and
+trying to merge a development branch with the master branch then merge conflicts occur.
+If data is the same inside those files, no conflict.
+
+You need to manually fix that particular file in a master branch, with the help of the developer and commit the file.
+
+To check differences between two branches use the following command.
+# git diff development
+
+Here the master branch is compared with the development branch.
+
+# git diff development stage
+
+Here stage branch is compared with development branch
+
+Note : if you do not mention the second branch name it will consider comparison with the present branch.
+
+To push all branches from local to remote repository use following command
+# git push facebook --all
+
+Here facebook is the alias name to github remote repository url.
+
+To push specific branch from local to remote repository use following command
+# git push facebook master stage
+
+Here facebook is the alias name to github remote repository url.
+
+To delete a local repository branch use of following command
+# git branch -d stage
+
+Note : Being present in the branch(stage) you can't delete the same branch(stage).
+
+To delete a remote repository branch use of following command
+# git push facebook :stage
+
+Here facebook is the alias name to github remote repository url.
+
+To change the branch name use following command
+# git branch -M main
+
+Here the master branch is renamed to the main branch.
+
+Git Tag
+-------
+Tag is a meaningful name given to the last commit id of the production branch which we are going to deploy.
+In real-time we create tags on master/production branch after production deployment for a particular release.
+
+To see a tag name use following command
+# git tag
+
+To create a tag name use following command
+# git tag <tagname>
+eg. # git tag facebookv1.0.0
+here facebook is project name
+     1 is majour release
+     0 is minor release
+     0 is pach/bug fix release
+
+To delete a tag name use following command
+# git tag -d <tagname>
+
+To push a tag name to github remote repository use following command
+# git push facebook tag <tagname>
+
+To push a all tag name to github remote repository use following command
+# git push facebook --tags
+
+Note : Here facebook is the alias name to github remote repository url.
+
+With # git tag command you can create .zip and .tar.gz files in github remote repository.
+
+Git Stash
+---------
+Git stash is a temporary storage in your git local repository.
+
+Scenario: You are working on test.py files in the development branch, suddenly you got one bug fix ticket for the production/master branch.
+          You are in the middle of the development on the test.py file. You can't commit that file right away.
+          You have to switch to the master branch and fix the issue. 
+
+          You should not switch to another branch unless you commit your work in the current branch.         
+
+          In such cases we go for the stash concept.
+
+          Move test.py file code in stash memory for the time being and start working on the master branch issued after the issue is resolved, 
+          bring back your half done code from stash memory and start working on it.
+
+Recommended : First add and commit empty file before using for stash concept. or you have to add file to staging are then only you can use for stash . 
+
+To move your code to stash storage use the following Command.
+# git stash
+
+To check stash storage use the following Command.
+# git stash list
+
+Stash@{0} recently added new
+Stash@{1} previously added old
+Stash@{2} previously added old
+
+To bring back code from stash use the following Command.
+# git stash apply
+
+Above command will bring back latest changes Stash@{0}. If you want specific code use the following Command
+# git stash apply Stash@{1}
+
+To delete specific stash use the following command.
+# git stash drop Stash@{1}
+
+To apply and delete specific stash in single command use the following command.
+# git stash pop
+
+If you want specific
+# git stash pop Stash@{1}
+
+To clear complete stash use the following command.
+# git stash clear
+
+When you send data from file to stash it is cut and paste, when you bring back your data from stash to file it is copy and paste.
+
+Git cherry-pick
+---------------
+To get/integrate specific commit code with your branch we use cherry-pick command or to merge specific commit with your branch.
+# git cherry-pick <CI>
+
+What code is availabe in CI will get merge with current branch.
+
+Git clone
+---------
+It creates a local repository automatically with the same name as GitHub remote repository.
+Clone concept is used when your GitHub remote repository is already present.
+
+To clone github repository use the following command
+# git clone <github url>
+
+Git fetch
+---------
+When you run git fetch, updated code will get in local repo not getting working copy of files.
+
+# git fetch origin master
+
+Remote Repository 
+      |
+      | git fetch
+      |
+      v
+Local Repository 
+
+
+
+To get working copy need to run git merge command.
+# git merge origin master
+
+Remote Repository 
+      |
+      | git fetch
+      |
+      v
+Local Repository 
+      |
+      | git merge
+      |
+      v
+Working Area
+
+
+Git pull
+---------
+To get updated code from remote repository 
+ git pull =  git fetch +  git merge
+
+# git pull origin master
+
+
+**"THIS IS THE FIRST THING YOU HAVE TO DO WHEN YOU GET GIT AND GUTHUB ACCESS"**
+
+How to push and pull files in central repo without credentials????
+SSH Key
+-------
+Need to generate key in system using following command
+# ssh-keygen |_> |_>
+
+Now copy this key from ~/.ssh/id_rsa.pub file to github remote repository 
+Go to user setting 
+Click on ssh and gpg key
+Click on new ssh key 
+Provide title any name/project name
+Past that key here
+Click on add SSH key
+
+ssh -T git@github.com
+
+Note : In the real-time used company enterprise edition url instead of github.com 
+
+Now add ssh url in git local repository
+# git remote add origin git@github.com:rahulss-ec-project/facebook.git
+
+Here origin is an alias name to github remote repository ssh url,you can use any name eg.project name.
+
+To get code from github remote repository to git local repository
+# git pull origin master
+
+Here master is the github remote repository branch name, from which we are moving our code from git local repository master branch.
+
+
+PAT --> Personal Access Token
+-----------------------------
+Insted of using password to connect to github we use PAT.
+PAT is generated in github.
+
+Click on Settings --> Developer settings --> Personal access tokens --> Generate Token --> Token Name(any)
+Click on generate token and copy immidately. -->  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
+
+
+
+PR  --> Pull Request
+--------------------
+If you want to integrate one brach code with another branch in git local repository we use merge command.
+Same way if you want to integrate one brach code with another branch in github remote repository we use pull request.
+
+Senario : merge stage branch with master branch in github remote repository.
+
+Create Pull Request in master branch.
+Click on new pull request.
+Select branches master to stage.
+Click on Create pull request
+Click on Create pull request
+
+Once you create pull request copy pr url and share with senior devloper or devops enginer to review you code.
+https://github.com/rahulss-ec-project/facebook/pull/1
+
+Once you get approval you can merge. 
+
+Fork
+---- 
+Copy github remote repository to another github account.
+
+
+Branching Strategy
+------------------
+What are all the branches we have created for our project's successful development and deployment is called a branching strategy.
+Branching strategy is not fixed, it varies project to project and company to company based on environment(dev,qa,prod....).
+
+Development branch      --> Dev
+Stage branch            --> QA
+Master branch           --> Production
+
+                           Above environment is fixed.
+                           After QA we can add one more UAT (user acceptance test) environment for clients to test.
+                           Before production we can add one more SIT (system integration test) environment = production.
+
+
+Note : Each developer has his own branch and after code completion he creates PR to integrate with the development branch.
+
+If we face any issue in production, we directly start working on the production environment.we create a branch called bugfix_bg (bg = bug name)
+on top of the master branch.
+We integrate bugfix_bg with development and deploy to the dev environment,then QA and finally in PRO.We are not going to deploy directly to PRO.
+
+If a client has requirement to add one functionality in production on priority,we directly start working on the production environment.
+we create a branch called feature_fn (fn = function name) on top of the master branch.
+We integrate feature_fn with development and deploy to the dev environment,then QA and finally in PRO.We are not going to deploy directly to PRO.
+
+After work is done we delete bugfix_bg or feature_fn branches.
+
+
+Git rebase
+----------
+
+master
+  |
+  |
+  V
+  stage sc1 sc2 sc3
+
+master> git merge stage
+
+master sc
+  |
+  |
+  V
+  stage sc1 sc2 sc3
+=====================
+master
+  |
+  |
+  V
+  stage sc1 sc2 sc3
+
+master> git rebase stage
+
+master sc1 sc2 sc3
+  |
+  |
+  V
+  stage sc1 sc2 sc3
+
