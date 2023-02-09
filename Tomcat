@@ -1,0 +1,115 @@
+Application server
+------------------
+An application server is a server that hosts applications or software.
+
+
+WebSphere Application Server(WAS) - IBM
+WebSphere Liberty Profile - IBM
+WebLogic - Oracle
+JBoss/WildFly - RedHat -IBM
+Apache Tomcat
+
+Tomcat or Apache Tomcat is an open source, java based web applications server.Tomcat server developed using Java language.
+We can deploy and run the java based web applications(.war) only in tomcat. 
+Tomcat default port is 8080
+
+Tomcat Directory Structure
+--------------------------
+bin : Contains binary files eg.startup.sh, shutdown.sh, catalina.sh, version.sh
+---
+conf : Contains configuration files eg.server.xml, tomcat-users.xml
+----
+lib : Contains libarary files
+---
+logs : Contains log files
+----
+By default logs directory is empty when you start tomcat it will generate following logs.
+manager.log
+hostmanager.log
+catalina.log
+localhost.log
+
+webapps : Contains application we deploy(.war)
+-------
+work :
+----
+temp : Contains temporary files.
+----
+
+
+Tomcat Installation
+-------------------
+Prerequisites
+Java 8 or 11 (JER) is the Pre-Requisite Software for Tomcat.
+
+Launch linux EC2 with SSH(22) and Tomcat(8080) port.
+Login as a root user and update server
+$ sudo su -
+# yum update -y
+
+Instal Java, wget, tar, unzip and vim
+# yum install java-1.8* wget tar unzip vim -y
+
+To check jre version
+# java -version  
+
+Change directory 
+# cd /opt
+
+Download Tomcat 
+# wget https://dlcdn.apache.org/tomcat/tomcat-9/v9.0.64/bin/apache-tomcat-9.0.64.zip
+
+Unzip Tomcat 
+# unzip apache-tomcat-9.0.64.zip
+
+Rename Tomcat 
+# mv apache-tomcat-9.0.64 tomcat
+
+Remove Tomcat zip file
+# rm -rf apache-tomcat-9.0.64.zip
+
+Change directory
+# cd /opt/tomcat/bin 
+
+Give execute permission to .sh files
+# chmod +x *.sh
+
+Create link files for tomcat startup.sh 
+# ln -s /opt/tomcat/bin/startup.sh /usr/local/bin/tomcatup
+
+Create link files for tomcat shutdown.sh 
+# ln -s /opt/tomcat/bin/shutdown.sh /usr/local/bin/tomcatdown
+
+Edit file context.xml and comment value class.
+# vim /opt/tomcat/webapps/manager/META-INF/context.xml
+<!-- 
+ <valve className...
+ />
+-->
+
+# vim /opt/tomcat/webapps/host-manager/META-INF/context.xml
+<!-- 
+ <valve className...
+ />
+-->
+
+Add users with roles in file /opt/tomcat/conf/tomcat-users.xml
+# cd /opt/tomcat/conf/
+# vim tomcat-users.xml
+<user username="admin" password="admin" roles="manager-gui,admin-gui"/>
+
+# tomcatup and # tomcatdown
+Now you can login as admin user in manager app
+
+Can we change connector port no 8080 to 8090(any no of your choise)?
+Yes,To Change connector port no 8080 to 8090(any no of your choise) in file /opt/tomcat/conf/server.xml 
+#vim server.xml
+
+Open 8090 in instance SG 
+# tomcatdown and # tomcatup
+
+
+App server   vs     Web serve
+----------   --     ---------
+Dynamic web         static web
+                    act as LB  
