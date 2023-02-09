@@ -1,0 +1,220 @@
+Build Tools
+-----------
+Each programming language has various build tools
+
+Java---> Maven/Ant/Gradel
+.Net---> Nant/MS Build
+Python---> PyBuilder
+Ruby---> Rake
+
+Developers create Source Code and along with source code developer creates Build Script (pom.xml) where developers keep compiler and dependency.
+If you run BS it is going to create a package for your SC.
+
+Maven
+-----
+Maven is a Open Source, Java based build tool. Maven software developed using Java language.
+Build means converting the source code into an installable application/package is called build.
+
+Using Java we can create various typs of application
+1.Standalone Application (.jar--. Java Archive)
+SA contains only java code
+
+jar = .classfiles + manifiest files.
+
+2.Web Application (.war--. Web Archive)
+WA contains only java code + web containt (html/css/java script/xml/images)
+
+war = jar files + web content
+
+3.Enterprise Application (.ear--. Enterprise Archive)
+EA has multiple modules..
+
+ear = multiple jar + multiple war + resource files
+
+Maven Directory Structure
+-------------------------
+boot: Contain some files used by maven at run times.
+bin: Binary Files--> eg.mvn
+conf: Configuration Files--> eg.settings.xml
+lib: Library--> contains jar files
+
+Maven Installation in Linux
+---------------------------
+Prerequisites
+Java 8 or 11 (JDK) is the Pre-Requisite Software for Maven.
+
+Launch linux EC2 with SSH(22) port.
+Login as a root user and update server
+$ sudo su -
+# yum update -y
+
+To Install Java 8, wget, tar, unzip
+# yum install java-1.8* wget tar unzip -y
+
+To check jdk version
+# javac -version  
+
+Change directory 
+# cd /opt/
+
+Download the Maven Software 
+# wget https://dlcdn.apache.org/maven/maven-3/3.8.7/binaries/apache-maven-3.8.7-bin.zip
+
+Unzip Maven
+# unzip apache-maven-3.8.7-bin.zip
+
+To Set the class path/Environmental Variable
+
+For Specific User
+-----------------
+# vim ~/.bash_profile
+###Maven Installations###
+export M2_HOME=/opt/apache-maven-3.8.7
+export PATH=$PATH:$M2_HOME/bin
+
+# source ~/.bash_profile
+
+For All Users
+---------------------- 
+# vim /etc/profile
+###Maven Installations###
+export M2_HOME=/opt/apache-maven-3.8.7
+export PATH=$PATH:$M2_HOME/bin
+
+# source /etc/profile
+
+To Check the Maven version
+# mvn -version
+
+
+Sample content in POM.XML
+-------------------------
+pom.xml is a file where developers keep compiler and dependency.
+
+<project>
+
+<groupId>com.mt</groupId>                                ---> com.company name
+<artifactId>maven-standalone-application</artifactId>    ---> project name
+<version>0.0.1-SNAPSHOT</version>                        ---> build version
+<packaging>jar</packaging>                               ---> package type
+
+	<dependencies>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>3.8.1</version>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
+
+
+</project>
+
+When we built a Java project for the very first time using maven.
+1. It will check dependency in the local repository(~/.m2/repository), 
+2. When maven does not find dependency in the local repository.
+   Maven downloaded all dependencies from maven central repository or remote repository to local repository.
+
+Maven Repositories
+------------------
+1.Maven Local Repo
+~/.m2/repository ---> Default path for Maven Local Repo which is available in user home directory
+
+eg. /root/.m2/repository or /home/ec2-user/.m2/repository or /home/rahul/.m2/repository
+
+We can change local repository default path to custom path.
+MH ---> Maven Home Directory eg. /opt/apache-maven-3.8.7
+cd MH/conf/
+vim settings.xml
+
+add below entry/tag
+<localRepository>/path/to/local/repo</localRepository>
+
+2.Maven Central Repo
+
+This repository comes into play when maven does not find dependency in the local repository.
+It is managed by maven community.Must have internet connection to downloaded dependencies from maven central repository
+
+3.Remote Repo
+
+Enterprises usually maintain their own repository for dependency/libraries that are being used for the project and are accessible within the organization.
+eg. Nexus, Jfrog artifactory
+
+Maven Life Cycle
+----------------
+
+LC                         Goals
+--                         ----
+clean                      clean    : It will delete the previous build files.
+
+site                       site     : It will generate the documentation for the source code.
+
+default                    validate : It will validates the directory structure and files.
+                           compile  : It will compile the source code and junit test cases code.
+                           test     : It will run the junit test cases.
+                           package  : It will create artifact/package.(jar/war/ear)
+                           Install  : It will store the build artifact/package in Maven local repos.
+                           Deploy   : It will store the build artifact/package in Remote repos.
+
+
+mvn clean
+mvn test
+mvn package
+mvn clean package
+    ------------>
+
+If you want to skip run junit test cases.
+
+# mvn clean package -DskipTests 
+It will compile and skip junit test cases
+
+If you want to skip run junit test cases as well as compile junit test cases.
+
+# mvn clean package -Dmaven.test.skip=true
+It will skip compile and skip junit test cases
+
+LAB
+---
+
+# mvn -version
+# yum install git -y
+# mkdir java-projects
+# cd java-projects/
+# git clone https://github.com/MithunTechnologiesDevOps/maven-standalon-application.git
+# cd maven-standalon-application
+# tree
+
+Inside the maven-standalon-application repository two things developers create one is src and second thing is pom.xml.
+
+pom.xml is a file where developers keep compiler and dependency.
+src contains the main and test directory.
+main directory contains source code.
+test directory contains junit test cases.
+
+After running the mvn package command if you check maven local repo (/root/.m2/repository) you will find some dependency
+and Building jar at location /root/java-projects/maven-standalon-application/target/maven-standalone-application-0.0.1-SNAPSHOT.jar 
+
+Changing the default local repo to custom local repo.
+Create one directory in /root (you can take any location)
+# mkdir mvnlocalrepo
+
+Goto MH/conf/
+# cd /opt/apache-maven-3.8.7/conf/
+# vim settings.xml
+## add below entry ##
+<localRepository>/root/mvnlocalrepo/</localRepository>
+
+After running the mvn clean install you will find building jar at location (maven local repo)
+/root/mvnlocalrepo/com/mt/maven-standalone-application/0.0.1-SNAPSHOT/maven-standalone-application-0.0.1-SNAPSHOT.jar
+OR
+/root/.m2/repository/com/mt/maven-standalone-application/0.0.1-SNAPSHOT/maven-standalone-application-0.0.1-SNAPSHOT.jar    
+
+
+If you give following tag in pom.xml it will create package with name maven-web-application.war
+<finalName>maven-web-application</finalName>
+
+To create package for specific module from enterprises application
+# mvn clean package -pl <modulename1>,<modulename2>.....
+eg. # mvn clean package -pl MavenEnterpriseApp-ear
