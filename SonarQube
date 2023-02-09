@@ -1,0 +1,177 @@
+Continuous Code Quality Management Tool
+---------------------------------------
+
+SonarQube
+---------
+SonarQube is a Open Source, java based source code quality management tool.SonarQube server developed using Java language.
+It wil continuously check quality of the source code and if devloper is not following the standard it will generate the report. 
+It is a web based tool, support multiple languages(Java, C#, Js...).
+We can integrate sonarqube with multiple databases.
+SonarQube has inbuilt database called H2. 
+By default, SonarQube listens on port 9000
+
+
+SonarQube Architecture
+----------------------
+SonarScanner generate the sonarqube report and send to sonarqube server.
+SonarQube server has 4 components.
+Compute Engine :
+--------------
+It Classify the report in catagary baes on issue.
+1. Vaulnarabilities
+2. Bugs
+3. Code Smells
+
+H2 Database :
+-----------
+Reports are going to store in H2 databases.
+
+Web Server :
+----------
+With help of web server sonarquble server displya the reports.
+
+Search Engine :
+-------------
+It is used to get the result very quickly.
+
+
+SonarQube Installation in Linux
+---------------------------
+Prerequisites
+At least 4GB of RAM
+Java 8 or 11 (JDK) is the pre-requisite Software for SonarQube server based on version.
+
+Launch linux EC2 with SSH(22) and SonarQube(9000) port.
+Login as a root user and update server
+$ sudo su -
+# yum update -y
+
+To Install Java 11, wget, unzip and vim
+# yum install java-11* wget unzip vim -y
+
+To check jdk version
+# javac -version  
+
+Change directory 
+# cd /opt/
+
+Download SonarQube
+# wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.10.61524.zip
+
+Unzip Tomcat 
+# unzip sonarqube-8.9.10.61524.zip
+
+Rename Tomcat 
+# mv sonarqube-8.9.10.61524 sonarqube
+
+Remove Tomcat zip file
+# rm -rf sonarqube-8.9.10.61524.zip
+
+As a good security practice, SonarQube Server is not advised to run sonar service as a root user,
+so create a new user called sonar user and grant sudo access to manage sonar services as follows.
+# useradd sonar
+
+Give the sudo access to sonar user
+# vim /etc/sudoers
+sonar   ALL=(ALL)       NOPASSWD: ALL
+
+Change the owner and group permissions to /opt/sonarqube/ directory.
+# chown -R sonar:sonar /opt/sonarqube/
+# chmod -R 775 /opt/sonarqube/
+
+Now login as sonar user
+# su - sonar
+
+Change directory 
+# cd /opt/sonarqube/bin/linux-x86-64
+
+Run following script to start and stop sonarqube
+# ./sonar.sh start
+For status
+# ./sonar.sh status
+For stop
+# ./sonar.sh stop 
+
+Note : If you run sonar.sh being root user then delete temp directory from /opt/sonarqube/ directory. and again run sonar.sh being sonar user.
+
+Setting up sonarqube as systemd services 
+----------------------------------------
+Open /opt/sonarqube/bin/linux-x86-64/sonar.sh file and uncomment RUN_AS_USER parameter and set as sonar user.
+# vim /opt/sonarqube/bin/linux-x86-64/sonar.sh
+
+RUN_AS_USER=sonar
+
+Create vim /etc/systemd/system/sonar.service file and add below content.
+# vim /etc/systemd/system/sonar.service
+
+[Unit]
+Description=SonarQube service
+After=syslog.target network.target
+
+[Service]
+Type=forking
+
+ExecStart=/opt/sonarqube/bin/linux-x86-64/sonar.sh start
+ExecStop=/opt/sonarqube/bin/linux-x86-64/sonar.sh stop
+
+User=sonar
+Group=sonar
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+
+Run following command as root user
+# systemctl daemon-reload
+
+Run following command as sonar user
+# su - soanr
+$ sudo systemctl start sonar.service
+$ sudo systemctl enable sonar.service
+$ sudo systemctl status sonar.service
+
+
+User Name : admin
+Default Password : admin
+Password : Rahul@3738
+
+Add below tags in pom.xml
+
+ <properties>
+	<sonar.host.url>http://13.235.239.156:9000/</sonar.host.url> 
+	<sonar.login>admin</sonar.login>
+	<sonar.password>Rahul@3738</sonar.password>
+ </properties>
+
+Insted of password you can use token,simply generate the token and use it insted of password.
+
+ <properties>
+	<sonar.host.url>http://13.235.239.156:9000/</sonar.host.url>
+	<sonar.login>66423d9e4540cabe51c13c90993e559e8ab8697a</sonar.login>
+ </properties>
+
+Command to execute sonarqube report
+
+    plugin name
+mvn sonar:sonar
+          goal name
+
+Rules
+-----
+SonarQube server use rules to generate report
+
+Quality Profile 
+---------------
+Quality Profile is collection of rules which we are going to apply while executing the sonarqube report.
+As a DevOps engineer we are responsible to create quality profile based on devlopment team requirement.
+Sonar Way is Default Quality Profile.
+
+Quality Gates
+-------------
+Quality Gates is collection of conditions which we are going to apply while executing the sonarqube report.
+As a DevOps engineer we are responsible to create quality gates based on devlopment team requirement.
+Sonar Way is Default Quality Gates.
+
+Administration
+--------------
+It is used to manage sonarqube dashbord like creating user, adding user to groupe and so on.
