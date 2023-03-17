@@ -1,0 +1,92 @@
+
+Jenkins
+
+
+Find and set java path
+# find /usr/lib/jvm -type d -name java-11*
+# find /usr/lib/jvm -type d -name java-1.8* 
+
+#vim .bash_profile
+
+JAVA_HOME = <path>
+PATH=$PATH:$HOME/bin:$JAVA_HOME
+
+# source ~/.bash_profile
+
+
+______________________________________________________________________________
+Lab (Linux)
+
+1) First create is Linux EC2 instance with SSH, HTTP and 8080 port.
+2) Update EC2 Instance yum update -y.
+3) Install java package: yum install java-1.8* -y.
+4) Now set path of java 
+
+Find path
+#find /usr/lib/jvm/java-1.8* | head -3
+
+#vim .bash_profile
+
+JAVA_HOME = <path>
+PATH=$PATH:$HOME/bin:$JAVA_HOME
+
+Restart server
+
+
+Plugin
+
+Plugins provide integration point to other tools (Like connector between Jenkins and other tools). 
+Plugins are small library that add new ability to Jenkins.
+Jenkins comes up with some default plugins.
+
+Click on manage Jenkins.
+Click on plugin manage.
+Here you can install updated plugin
+
+
+______________________________________________________________________________
+Related / Linked Jobs
+
+We are having two types of Linked job
+
+1) Downstream 
+After first job complete second job start,
+We need to mention second job name in first job.( You can mention any number of job by using comma , )
+
+Post-build action
+Select build other projects
+Provide the second job name.
+
+2) Upstream
+After first job complete second job start,
+We need to mention first job name in second job.
+
+Select build after other projects are build check box in Build Trigger and mentioned first job name.
+
+
+______________________________________________________________________________
+
+User management
+
+In company Jenkins installed in one server and everyone accessing that server being Norma user.
+Creating user in Jenkins
+
+Click on manage Jenkins
+Click on manage user
+Create user 
+
+Now to give limited access to user first revoke complete accept then give required access.
+
+For that we need one plugin - Role-based authorization strategy.
+
+Install above plugin.
+
+Now 
+Click on manage Jenkins
+Click on configure global security
+Select Role-Based Strategy in Authorization Tab.
+Click on save
+
+Now created role and attached role to users. They will get limited as well as full access for few things.
+
+

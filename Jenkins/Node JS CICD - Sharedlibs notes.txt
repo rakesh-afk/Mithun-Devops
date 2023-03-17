@@ -1,0 +1,126 @@
+Java - Maven Build Tool                Node Js
+----------------------                 ------- 
+pom.xml                               package.json (Node Modules)
+
+mvn clean package                     npm install
+
+mvn clean sonar:sonar                 npm run sonar (OR) node sonar-project.js
+
+pom.xml                               sonar-project.js
+
+mvn deploy                            npm publish
+
+pom.xml --> nexus repos               package.json --> nexus repos
+
+settings.xml --> nexus credentilas    Create file .npmrc --> nexus credentials -- base64 
+
+
+npm(hosted)
+-----------
+Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
+Select Recipe npm(hosted) --> Provide repository name as project name(facebook-nodejs-repo) --> Select Deployment policy as Allow redeploy --> 
+click on Create.
+
+http://3.110.93.174:8081/repository/facebook-nodejs-repo/
+
+To generate nexus token execute the following command
+# echo -n "admin:Rahul3738" | openssl base64 
+
+YWRtaW46UmFodWwzNzM4
+
+yum install nodejs -y
+
+
+node{
+  
+    //CheckoutCode Stage 
+    stage('CheckoutCode'){
+        git credentialsId: 'GitHub_Credentials', url: 'https://github.com/Rahul3738/nodejs-app-mss.git'
+    }
+
+    // Build Stage
+    stage('Build'){
+        nodejs(nodeJSInstallationName: 'NodeJS19.5.0'){
+            sh "npm install"
+        }   
+    }
+
+ /*   
+    //Generate SonarQube Report Stage
+    stage('SonarQubeReport'){
+        sh "node sonar-project.js"
+    }
+*/
+
+    //Generate SonarQube Report Stage
+    stage('SonarQubeReport'){
+        nodejs(nodeJSInstallationName: 'NodeJS19.5.0'){
+            sh "npm run sonar"
+        }     
+    }
+/*
+    //Upload Artifacts into Nexus Stage
+    stage('UploadArtifactsIntoNexus'){
+        sh "npm publish"
+    } 
+*/
+    //Run the NodeJS App
+    stage("RunTheNodeJSApp"){
+        sh "npm run start &"     // & is used to run command in background
+    }   
+
+}
+
+http://65.2.123.87:9981/mithuntechnologies
+
+echo -n 'admin:admin123' | openssl base64
+
+
+npm login --registry=http://13.233.36.149:8081/repository/nodejs-repo/
+
+
+
+Jenkins Shared Library
+----------------------
+It is the concept of having common pipeline code on VCS that can be used by any number of pipeline just buy referencing it.
+In fact multiple teams can use the same library for therir projects. 
+
+@Library('msssharedlibs') _
+
+pipeline{
+    
+    agent any
+	
+	tools{
+	 maven 'maven3.8.2'
+	}
+    
+    stages{
+        
+        stage('CheckOutCode'){
+            
+            steps{
+                
+                git branch: 'development', credentialsId: '12993250-1ff3-40a0-9978-794e74dcf712', url: 'https://github.com/MithunTechnologiesDevOps/maven-web-application.git'
+            }
+        }
+		
+		stage('Build'){
+		 steps{
+		  stages("Build")
+		 }
+		}
+		stage('Execute SOanrQube Report'){
+		 steps{
+		  stages("SonarQube Report")
+		 }
+		}
+    }
+}
+
+
+
+
+
+
+

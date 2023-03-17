@@ -1,0 +1,524 @@
+Jenkins
+-------
+Jenkins is an open source, java based CI(continuous integration) tool. Jenkins software developed using Java language.
+Jenkins paid version is Hudson developed by oracle in 2004.Jenkins free version is jenkins developed by jenkins community in 2012.
+By default, Jenkins listens on port 8080.
+
+What is CI?
+-----------
+CI stands for continuous integration.
+CI is the process of automating the build and testing the source code every time when developers push code to the version control system.
+
+Tools used in CI
+----------------
+GitHub
+Maven
+SonarQube
+Nexus
+Jenkins
+
+After developer push code to github jenkins pull code and execute unit test cases using maven server,execute sonarqube report and 
+upload into sonarqube server,build artifacts using maven and finally upload artifacts to nexus server is complete CI process.
+
+CI Benifits
+-----------
+Immediate bug detection and get rectified fast so the entire sdlc happens fast.
+No human integration step on the SDLC
+Can deploy at any give time
+
+What is CD?
+-----------
+CD stands for continuous delivery or deployment.
+For production deployment we manually triggering the job is called continuous delivery.
+continuous delivery model we use for external projects(Client)
+Hand overing end product to client.
+
+For production deployment automatically triggering the job is called continuous deployment.
+continuous deployment module we use for in house projects.
+
+CI Tools
+--------
+Jenkins
+Hudson
+Bamboo 
+
+Jenkins Installation in Linux
+---------------------------
+Prerequisites
+At least 4GB of RAM
+Java 8 or 11 (JER) is the pre-requisite Software for Jenkins server.
+
+Launch linux EC2 with SSH(22) and Jenkins(8080) port.
+Login as a root user and update server
+$ sudo su -
+# yum update -y
+
+# yum install wget -y
+# sudo wget -O /etc/yum.repos.d/jenkins.repo https://pkg.jenkins.io/redhat-stable/jenkins.repo
+# sudo rpm --import https://pkg.jenkins.io/redhat-stable/jenkins.io.key
+# yum install fontconfig java-11-openjdk -y
+# yum install jenkins -y
+
+# systemctl start jenkins
+# systemctl enable jenkins
+# systemctl status jenkins
+
+To check jenkins version
+# jenkins --version
+
+Install git in Jenkins Server
+# yum install git -y
+
+User Name : Rahul3738
+Password : Rahul@3738
+
+Lab
+---
+Create a first job in jenkins as a freestyle project type to integrate github,maven,sonarqube,nexus and tomcat with jenkins.
+----------------------------------------------------------------------------------------------------------------------------
+
+Click on New Item --> Provide Job Name (Projet Name + Environment) Facebook-Dev --> Select Freestyle project --> Click on Ok 
+Provide Descriptions(Optional) "CIntegration and CDeployment for facebook application in dev environment".
+
+Click on Source Code Management --> Select Git --> Repository URL(https://github.com/Rahul3738/maven-web-application.git)
+Select user name and password or add user name and password --> Provide branch name (development)
+
+Click on Build Steps --> Click on Add build step --> Select Invoke top-level Maven targets --> Select Maven version --> Provide gole (clean package)
+
+Click on Build Now.
+
+If you want to execute sonarqube report.
+---------------------------------------
+Click on Build Steps --> Click on Add build step --> Select Invoke top-level Maven targets --> Select Maven version --> 
+Provide gole (clean package sonar:sonar)
+
+Click on Build Now.
+
+If you want to deploy artifact to nexus reposioty.
+--------------------------------------------------
+Click on Build Steps --> Click on Add build step --> Select Invoke top-level Maven targets --> Select Maven version --> 
+Provide gole (clean package sonar:sonar deploy)
+
+Click on Build Now.
+
+If you want to deploy artifact to tomcat server.
+-----------------------------------------------
+First install one plugin called as "Deploy to container" and Create tomcat user with roll manager-gui, admin-gui and manager-script inside tomcat server.
+
+Click on Post-build Actions --> Click on Add post-build Actions --> Select Deploy war/ear to a container --> 
+Provide WAR/EAR files (**/maven-web-application.war) --> Click on Add Container and select tomcat version --> 
+Select user name and password or add user name and password --> Provide Tomcat URL http://35.154.194.119:8080
+
+
+/var/lib/jenkins  --> Jenkins Default HD
+
+         /workspace
+            /facebook-dev
+               /target
+                  /maven-web-application.war
+
+
+
+Global tool configuration
+-------------------------
+Provide address/path of other tools like Git,  Maven, Java to Jenkins which are already installed in your machine where Jenkins is installed.
+When you run any job and job required any tool them Jenkins can make use of those already available tool.
+If you not provide address of those tools then Jenkins will install those tools.
+
+You can also install multiple version of maven using GTC
+
+Click on Manage Jenkins --> Click on Global tool configuration --> Click on Maven Installation --> Provide any name
+Unchecked install automatically --> Provide path --> Click on save.
+
+OR
+
+Click on Manage Jenkins --> Click on Global tool configuration --> Click on Maven Installation --> Provide any name
+Checked install automatically --> Select version --> Click on save.
+
+Automate the Build Trigger Process
+----------------------------------
+
+Build Periodically
+------------------
+Build is going to trigger every minute or mention time irrespective of changes are available or not in remote reposiotry.
+After every minute or mention time Jenkins pull code from Central repository and Jenkins build trigger.
+
+Click on Build Triggers --> Select Build Periodically checkbox --> provide time interval as per you requirement( * * * * *) 
+
+Poll SCM
+--------
+Build is going to trigger if changes are available in remote reposiotry.
+After every minute or mention time interval if new changes are available in Central repository then only Jenkins build trigger.
+
+Click on Build Triggers --> Select Poll SCM checkbox --> provide time interval as per you requirement( * * * * *) 
+
+Github Web Hook
+---------------
+Build is going to trigger after code push to github.(GitHub will inform to jenkins)
+
+Click on Build Triggers --> Select GitHub hook trigger for GITScm polling
+
+Click on Settings --> Click on Webhooks --> Click on Add Webhooks --> Provide Payload URL as jenkins URL along with extension 
+(http://3.111.54.99:8080/github-webhook/) --> Select Content type as application/json --> Click on Add Webhook.
+
+Note : In the real-time we use github webhook most of the time.
+
+
+Build Environment
+-----------------
+Delete workspace before build starts:
+------------------------------------
+If you will select Checkbox it will delete SC before build start and fetch all SC.
+If you doesn't select Checkbox it will not delete SC before build start and fetch only updated SC.
+
+Add timestamps to the Console Output:
+------------------------------------
+If you will select Checkbox it will add timestamps to the console output.
+
+
+If you want to delete previous builds.
+Click on General --> Select Discard old builds checkbox --> Provide Days to keep builds and Max numbers of builds to keep -->
+Click on Advance --> Provide Days to keep artifacts and Max numbers of builds to keep with artifacts same as above.
+
+If your servers are downe and if you dont want to trigger any build job then we select disable Project option.
+
+
+JaCoCo Plugin
+-------------
+Java Code Coverage pluging using this plugin we can generate the junit test reports and we can stop the deployment if the code coverage is not upto the 
+threshold value (80% or 90%)
+
+Click on Post-build Actions --> Click on Add post-build Actions --> Select Record JaCoCo coverage report --> 
+Select Change build status according to the defined thresholds checkbox --> Provide threshold value --> 
+select Fail the build if coverage degrades more than the delta thresholds checkbox
+
+If you doesn't select checkbox it will check the coverage but won't stop the deploy.
+
+
+Jenkins Directory Structure
+---------------------------
+/var/lib/jenkins  --> Jenkins Default HD
+
+
+jobs : contains all job informetion
+----
+facebook-dev
+ nextbuildNumber --> file
+ builds          --> dir
+  1
+   log
+  2
+   log
+  3
+   log
+  4
+   log
+ config.xml
+facebook-qa
+
+workspace : contains directory with jobname and inside it contain traget directory and inside target direcoty contains build package
+---------
+facebook-dev 
+  target 
+    maven-web-application.war
+facebook-dev@tmp
+
+tools : contain tools installed through global tool configuration 
+-----
+hudson.tasks.Maven_MavenInstallation
+  maven3.8.7
+
+users : contain user information
+-----
+ users.xml
+
+plugins : contains all the plugins installed in jenkins
+-------
+
+
+Create a job in jenkins as a maven project type to integrate github,maven,sonarqube,nexus and tomcat with jenkins.
+-----------------------------------------------------------------------------------------------------------------
+First install one plugin called as "Maven Integration".
+
+Click on New Item --> Provide Job Name (Projet Name + Environment) maven-facebook-dev --> Select maven project --> Click on Ok 
+Provide Descriptions(Optional) "CIntegration and CDeployment for facebook application in dev environment".
+
+Click on Source Code Management --> Select Git --> Repository URL(https://github.com/Rahul3738/maven-web-application.git)
+Select user name and password or add user name and password --> Provide branch name (development)
+
+Click on Build --> Provide Goals and options (clean package)
+
+Plugin Management
+-----------------
+*Deploy to container : To deploy a war to a container(tomcat, jboss or Glassfish) after a successful build. 
+*Maven Integration : This plugin provides a deep integration between Jenkins and Maven.
+*Safe Restart : This plugin allows you to restart Jenkins safely.
+Next Build Number : Sets the build number Jenkins will use for a job's next build
+*JaCoCo : This plugin integrates JaCoCo code coverage reports to Jenkins.
+*SSH Agent : This plugin allows you to provide SSH credentials.
+*Email Extension 
+SonarQube Scanner : This plugin allows an easy integration of SonarQube, the open source platform for Continuous Inspection of code quality.
+*Audit Trail : Keep a log of who performed particular Jenkins operations, such as configuring jobs.
+*Job Configuration History : Job history plugin for Jenkins.
+Schedule Build : Adds capability to schedule a build for a later point in time.
+Blue Ocean Pipeline Editor : 
+*Publish Over SSH : Send build artifacts over SSH
+*ThinBackup : To take a backup of jenkins in same server where jenkins is installed.
+*Build Name and Description Setter : This plugin sets the display name of a build to something other than #1, #2, #3, ... so
+*Convert To Pipeline : This plugin converts Freestyle jobs to Pipeline jobs.
+*Role-based Authorization Strategy
+
+
+To change jenkins default port 8080 to 8090.
+REHL
+----
+Edit below file in redhat server
+# vim /etc/sysconfig/jenkins
+
+JENKINS_PORT="8090"
+
+Ubuntu
+------
+Edit below file in ubuntu server
+# vim /etc/default/jenkins
+
+JENKINS_PORT="8090"
+
+OR
+
+# vim /usr/lib/systemd/system/jenkins.service
+
+Environment="JENKINS_PORT=8080" --> Environment="JENKINS_PORT=8090"
+
+systemctl daemon-reload
+
+
+Views
+-----
+In real-time jenkins server has 100+ jobs are there for multiple projects. 
+You can create separate view for your job. eg. facebook related Job in one view, myntra related job in one view.
+
+Deleting view doesn't mean that to delete job.
+
+
+Jenkins Security
+----------------
+Providing access of jenkins server to devloper and devops engineer we create user.
+
+Click on Manage Jenkins --> Click on Manage Users --> Create User --> Provide User Name, Password, Full Name and Email ID.
+
+Aarush - DevOps Engineer
+Tanuja - Developer
+
+Click on Manage Jenkins --> Click on Configure Global Security --> Select Project-based Matrix Authorization Strategy in Authorization Tab -->
+Add users --> Provide required access by selecting checbox --> Click on Save.
+.
+.
+.
+.
+.
+.
+
+
+Jenkins Backup
+--------------
+First install one plugin called as "ThinBackup".
+
+Create directory to store backup (At any location you can create)
+# cd /var/lib/jenkins
+# mkdir jenkins_backup
+# chown -R jenkins:jenkins jenkins_backup
+
+Click on Manage Jenkins --> Click on ThinBackup in bottom --> click on settings --> Provide backup direcotry as above created directory path -->
+Provide Max number of backup sets (you can give any) --> Select options of your choise --> Click on Save
+
+Now if you click on backup now it will take backup of your jenkins server.
+
+If you don't want to click manually. Provide cronjob in settings for Backup schedule for full backups OR Backup schedule for differential backups.
+
+
+Create a CI/CD for Java Project using Pipeline Project Type - Scripted Way
+--------------------------------------------------------------------------
+Click on New Item --> Provide Job Name (Projet Name + Environment) facebook-dev-scripted --> Select pipeline project --> Click on Ok 
+Provide Descriptions(Optional) "CIntegration and CDeployment for facebook application in dev environment".
+
+Here def is keyword to declare a variable, mavenhome is variable name.
+If you are using maven through global tool configuration then you have to declare a variable which having mavne version name.
+
+Below stage syntax will work when you install maven in jenkins server
+    stage('Build'){
+        sh "mvn clean package"
+    }
+
+Here instage of CheckoutCode, Build .... you can give any name for stage identification.
+
+To copy file from one server to another server we use SCP command.To achive this using jenkins,First install one plugin called as "SSH Agent".
+To copy file from one server to another server we need user name and password of target sever.
+Either use user name and password or use username and .pem file.
+
+Under kind select SSH username with privete key --> provide username and select primary key enter directly radio button --> provide primary key --> 
+Click on Add.
+
+Provide write access to others or full access to webapps directory of tomcat
+# chmod -R 757  webapps/
+
+
+By default script is going to run on matser instance. If you want to specify node/slave name specify like below syntax.
+
+node('node1'){
+
+stage("StageName"){
+
+ }
+}
+
+// --> for single line comment
+
+/*
+
+for multiple line comment.
+
+*/ 
+
+Create a CI/CD for Java Project using Pipeline Project Type - Declarative Way
+-----------------------------------------------------------------------------
+Click on New Item --> Provide Job Name (Projet Name + Environment) facebook-dev-declarative --> Select pipeline project --> Click on Ok 
+Provide Descriptions(Optional) "CIntegration and CDeployment for facebook application in dev environment".
+
+By default script is going to run on matser instance. If you want to specify node/slave name specify like below syntax.
+
+pipeline{
+    agent any
+
+/*
+agent{
+    lable 'nodename'
+}
+*/
+
+}
+
+MultiBranch Pipeline (Optional)
+-------------------------------
+
+
+Build With Parameters
+---------------------
+If you want to pass parameters dynamically while running the job we are going to use BWP.
+
+Click on General --> Select This project is parameterized --> Click on Add Parameter --> Choice Parameter --> Provide name any (branchname) -->
+Provide Choices (development, qa, uat)
+
+Now insted of branch name in frestyle or Maven project type use ${branchname} and scripted project type use ${params.branchname}
+
+ 
+Jenkins Master Slave Architecture
+---------------------------------
+If you have 100 job in master instance and if you trigger all jobs it will take lots of time to complete the execution of job.
+Insted of that we can create slave/node/instances and distribute jobs based upon the server configuration of slave,
+so it will take less time to complete the execution of job and improve the performance.
+
+Job information is stored/available in master only and job sc is stored in slave only.
+We will not install jenkis in slave instance, we install java only in slave instance.
+We can create slave in any of the OS.
+
+Note: In the real-time we create slaves in another linux server only.
+
+Prerequisites of slave Instance
+-------------------------------
+Java 8 or 11 (JDK) and git is the pre-requisite Software for slave instance.
+
+Launch linux EC2 with SSH(22) port.
+Login as a root user and update server
+$ sudo su -
+# yum update -y
+
+Instal Java and git
+# yum install java-11-openjdk git -y
+
+To check jre version
+# java -version  
+
+# exit
+
+Create directory to store node information
+$ mkdir slave1
+$ cd slave1
+$ pwd slave1
+/home/ec2-user/slave1
+
+To create slave in jenkins master
+--------------------------------- 
+Click on Manage Jenkins --> Click on Manage Nodes and Clouds --> Click on New Node --> Provide Node name any (slave1) --> Select Permanent Agent --> 
+Click on Create --> Provide Description (Optional) --> Provide Number of executors --> Provide Remote root directory as 
+directory path we created in slave instance (/home/ec2-user/slave1) --> Provide Labels (anyname) --> Select Launch method as Launch agents via SSH -->
+Provide Host as public or private IP of slave instance --> Select user name and password or add user name and password --> 
+Select SSH username with privete key --> provide username and select primary key enter directly radio button --> provide primary key --> Click on Add -->
+Select Host Key Verification Strategy as Manually trusted key Verification Strategy --> Select Availability as Keep this agent online as much as possible 
+--> Click on Save.
+
+
+To configure slave in job
+------------------------
+Click on General --> Select Restrict where this project can be run --> Provide Label Expression (slaves)
+
+Note : Based on Number of executors we can deside how many job slave can run at one time.Default value is 1
+       Using Labels name master can assign specific job to specific slave.
+
+
+
+Jenkins CLI (Session 9)
+-----------------------
+http://3.110.80.149:8080/cli
+
+download jenkins-cli.jar
+exwcute below command in gitbash
+java -jar jenkins-cli.jar -s http://3.110.80.149:8080/ -webSocket help
+
+
+Migration (Session 9)
+---------------------
+
+Create a CI/CD for NodeJS Project using Pipeline Project Type - Scripted Way
+----------------------------------------------------------------------------
+First install one plugin called as "NodeJs" and cofigure NodeJS version in GTC just like maven.
+
+
+
+
+Create a CI/CD for NodeJS Project using Pipeline Project Type - Declarative Way
+-----------------------------------------------------------------------------
+
+
+Related/Linked Jobs
+---------------------
+We are having two types of Linked job
+
+1) Downstream 
+After first job complete second job start,
+We need to mention second job name in first job.( You can mention any number of job by using comma , )
+
+Post-build action --> Select build other projects --> Provide the second job name.
+
+2) Upstream
+After first job complete second job start,
+We need to mention first job name in second job.
+
+Build Trigger --> Select Build after other projects are built --> Provide first job name.
+
+facebok-dev --> upstream job for qa
+
+facebook-qa --> downstream job for dev and upstream job for prod
+
+facebook-prod --> downstream job for qa
+
+
+
+
+
+
+
+
+
+
+

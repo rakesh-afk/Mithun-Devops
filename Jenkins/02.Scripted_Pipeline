@@ -1,0 +1,36 @@
+node{
+
+    // Discard old builds
+    properties([buildDiscarder(logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')), [$class: 'JobLocalConfiguration', changeReasonComment: '']])
+    
+    // GitHub hook trigger for GITScm polling
+    properties([[$class: 'JobLocalConfiguration', changeReasonComment: ''], pipelineTriggers([githubPush()])])
+
+    //CheckoutCode Stage 
+    stage('CheckoutCode'){
+        git branch: 'development', credentialsId: 'GitHub_Credentials', url: 'https://github.com/Rahul3738/maven-web-application.git'
+    }
+
+    // Below stage will work when you install maven in jenkins server
+    //Build Stage
+    stage('Build'){
+        sh "mvn clean package"
+    }
+/*   
+    //Generate SonarQube Report Stage
+    stage('SonarQubeReport'){
+        sh "mvn sonar:sonar"
+    }
+*/
+
+    //Upload Artifacts into Nexus Stage
+    stage('UploadArtifactsIntoNexus'){
+        sh "mvn deploy"
+    }
+
+    //Deploy App to Tomcat Stage using Deploy to Container plugin
+    stage('DeployWarToTomcat'){
+        deploy adapters: [tomcat9(credentialsId: 'tomcat_credentials', path: '', url: 'http://3.110.43.184:8080/')], contextPath: null, onFailure: false, war: '**/maven-web-application.war'
+    }
+
+} //Node Closing

@@ -1,0 +1,32 @@
+pipeline{
+
+    agent any
+
+    tools{
+        maven "maven3.8.5"
+    }
+    
+    parameters {
+        choice choices: ['development', 'qa', 'uat'], name: 'branchname' 
+        string ''
+    }
+
+    stages{
+
+        // CheckoutCode Stage 
+        stage('CheckoutCode'){
+            steps{
+                git branch: "${params.branchname}", credentialsId: 'GitHub_Credentials', url: 'https://github.com/Rahul3738/maven-web-application.git'
+            }
+        }
+        
+        // Build Stage
+        stage('Build'){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+        
+       
+    } // Stages Closing
+} // Pipeline Closing

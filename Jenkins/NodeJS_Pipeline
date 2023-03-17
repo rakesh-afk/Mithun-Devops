@@ -1,0 +1,39 @@
+node{
+  
+    //CheckoutCode Stage 
+    stage('CheckoutCode'){
+        git credentialsId: 'GitHub_Credentials', url: 'https://github.com/Rahul3738/nodejs-app-mss.git'
+    }
+
+    // Build Stage
+    stage('Build'){
+        nodejs(nodeJSInstallationName: 'NodeJS19.5.0'){
+            sh "npm install"
+        }   
+    }
+
+ /*   
+    //Generate SonarQube Report Stage
+    stage('SonarQubeReport'){
+        sh "node sonar-project.js"
+    }
+*/
+
+    //Generate SonarQube Report Stage
+    stage('SonarQubeReport'){
+        nodejs(nodeJSInstallationName: 'NodeJS19.5.0'){
+            sh "npm run sonar"
+        }     
+    }
+/*
+    //Upload Artifacts into Nexus Stage
+    stage('UploadArtifactsIntoNexus'){
+        sh "npm publish"
+    } 
+*/
+    //Run the NodeJS App
+    stage("RunTheNodeJSApp"){
+        sh "npm run start &"     // & is used to run command in background
+    }   
+
+}

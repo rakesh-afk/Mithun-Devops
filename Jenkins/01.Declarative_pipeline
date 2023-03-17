@@ -1,0 +1,62 @@
+pipeline{
+
+    agent any
+
+    tools{
+        maven "maven3.8.5"
+    }
+
+    options {
+        buildDiscarder logRotator(artifactDaysToKeepStr: '', artifactNumToKeepStr: '5', daysToKeepStr: '', numToKeepStr: '5')
+        timestamps()
+    }
+
+    triggers {
+        //pollSCM('* * * * *')
+        cron('* * * * *')
+    }
+
+    stages{
+
+        // CheckoutCode Stage 
+        stage('CheckoutCode'){
+            steps{
+                git branch: 'development', credentialsId: 'GitHub_Credentials', url: 'https://github.com/Rahul3738/maven-web-application.git'
+            }
+        }
+        
+        // Build Stage
+        stage('Build'){
+            steps{
+                sh "mvn clean package"
+            }
+        }
+
+        // Generate SonarQube Report Stage
+        stage('SonarQubeReport'){
+            steps{
+                sh "mvn sonar:sonar"
+            }
+        }
+
+        //Upload Artifacts into Nexus Stage
+        stage('UploadArtifactsIntoNexus'){
+            steps{
+                sh "mvn deploy"
+            }
+        }
+
+        //Deploy App to Tomcat Stage using SSH Agent plugin
+        stage('DeployWarToTomcat'){
+            steps{
+                sshagent(['15a6d91a-850c-4142-8387-dfc4867c551c']) {
+                    sh "scp -o StrictHostKeyChecking=no target/maven-web-application.war ec2-user@13.126.174.188:/opt/tomcat/webapps"
+                }
+            }
+        }    
+
+
+    } // Stages Closing
+
+    
+} // Pipeline Closing
