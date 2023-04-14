@@ -10,6 +10,11 @@ We can integrate sonarqube with multiple databases.
 SonarQube has inbuilt database called H2. 
 By default, SonarQube listens on port 9000
 
+Sonarqube support only following external databases.
+1.Oracle
+2.MS SQL Server
+3.MySQL --> Widely Used
+4.Postgre SQL --> Widely Used
 
 SonarQube Architecture
 ----------------------
@@ -34,7 +39,6 @@ Search Engine :
 -------------
 It is used to get the result very quickly.
 
-
 SonarQube Installation in Linux
 ---------------------------
 Prerequisites
@@ -47,7 +51,7 @@ $ sudo su -
 # yum update -y
 
 To Install Java 11, wget, unzip and vim
-# yum install java-11* wget unzip vim -y
+# yum install java-11* wget unzip vim -y OR yum install java-11-openjdk-devel wget unzip vim -y
 
 To check jdk version
 # javac -version  
@@ -57,6 +61,7 @@ Change directory
 
 Download SonarQube
 # wget https://binaries.sonarsource.com/Distribution/sonarqube/sonarqube-8.9.10.61524.zip
+       
 
 Unzip Tomcat 
 # unzip sonarqube-8.9.10.61524.zip
@@ -96,10 +101,10 @@ Note : If you run sonar.sh being root user then delete temp directory from /opt/
 
 Setting up sonarqube as systemd services 
 ----------------------------------------
-Open /opt/sonarqube/bin/linux-x86-64/sonar.sh file and uncomment RUN_AS_USER parameter and set as sonar user.
+Open /opt/sonarqube/bin/linux-x86-64/sonar.sh file and add RUN_AS_USER parameter and set as sonar user.
 # vim /opt/sonarqube/bin/linux-x86-64/sonar.sh
 
-RUN_AS_USER=sonar
+RUN_AS_USER="sonar"
 
 Create vim /etc/systemd/system/sonar.service file and add below content.
 # vim /etc/systemd/system/sonar.service
@@ -147,7 +152,7 @@ Insted of password you can use token,simply generate the token and use it insted
 
  <properties>
 	<sonar.host.url>http://13.235.239.156:9000/</sonar.host.url>
-	<sonar.login>66423d9e4540cabe51c13c90993e559e8ab8697a</sonar.login>
+	<sonar.login>squ_0ee47c22e9452c7199bb8a438daf8ca8ebf36367</sonar.login>
  </properties>
 
 Command to execute sonarqube report
@@ -156,22 +161,32 @@ Command to execute sonarqube report
 mvn sonar:sonar
           goal name
 
+Sonarqube Server Directory structure
+------------------------------------
+bin : Contain binary files.
+conf : Contain sonar.properties configurations file 
+lib : 
+logs : logs
+temp
+
 Rules
 -----
-SonarQube server use rules to generate report
+SonarQube server use rules to generate report/issues.
 
 Quality Profile 
 ---------------
 Quality Profile is collection of rules which we are going to apply while executing the sonarqube report.
-As a DevOps engineer we are responsible to create quality profile based on devlopment team requirement.
+As a DevOps engineer we are responsible to create quality profile with set of rules based on devlopment team requirement.
 Sonar Way is Default Quality Profile.
+We can apply Quality Profile to specific project as well as all java project.
 
 Quality Gates
 -------------
 Quality Gates is collection of conditions which we are going to apply while executing the sonarqube report.
+Based on guality gates sonarqube server mark project is passed or failed.
 As a DevOps engineer we are responsible to create quality gates based on devlopment team requirement.
 Sonar Way is Default Quality Gates.
 
 Administration
 --------------
-It is used to manage sonarqube dashbord like creating user, adding user to groupe and so on.
+It is used to manage sonarqube dashboard like creating user, adding user to groupe and so on.
