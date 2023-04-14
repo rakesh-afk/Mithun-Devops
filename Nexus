@@ -5,7 +5,7 @@ JFrog Artifactory
 
 Nexus/ Sonartype Nexus
 ----------------------
-Nexus is a Open Source, Java based artifactory repository manager tool. Nexus software developed using Java language.
+Nexus is a Open Source, Java based artifact repository manager tool. Nexus software developed using Java language.
 Nexus is used to store the build artifacts as well as retrive the build artifacts whenever we require.
 By default, Nexus listens on port 8081
 
@@ -15,15 +15,14 @@ In the real-time we create on docker registory in nexus and store our custom doc
 
 What is diff b/w GitHub and Nexus?
 GitHub is a SCM,  used to store the code as well as retrive the code whenever we require.
-Nexus is a Open Source, Java based artifactory repository manager tool, 
+Nexus is a Open Source, Java based artifact repository manager tool, 
 used to store the build artifacts as well as retrive the build artifacts whenever we require.
 
 Nexus Directory Structure
 --------------------------
 bin : Contains binary files eg.nexus.rc, nexus
----
 etc : Contains configuration files eg.nexus-default.properties
----
+lib : 
 
 Nexus Installation in Linux
 ---------------------------
@@ -73,24 +72,19 @@ Change the owner and group permissions to /opt/nexus and /opt/sonatype-work dire
 
 Open /opt/nexus/bin/nexus.rc file and uncomment run_as_user parameter and set as nexus user.
 # vim /opt/nexus/bin/nexus.rc
-run_as_user="nexus"
-
-OR
-
-echo 'run_as_user="nexus"' > /opt/nexus/bin/nexus.rc
+run_as_user="nexus" OR # echo 'run_as_user="nexus"' > /opt/nexus/bin/nexus.rc
 
 Create nexus as a service
 # ln -s /opt/nexus/bin/nexus /etc/init.d/nexus
 
+Run following command as root user
+# systemctl daemon-reload
+
 Switch as a nexus user and start the nexus service as follows.
 # sudo su - nexus
-
-Enable the nexus services
 # sudo systemctl enable nexus
-# sudo systemctl is-enabled nexus
-
-Start the nexus service
 # sudo systemctl start nexus
+# sudo systemctl is-enabled nexus
 # sudo systemctl status nexus
 
 User Name : admin
@@ -144,40 +138,34 @@ Click on browse server contents next to settings tab --> Click on browse tab lef
 
 In Real-time we configure nexus repository url in pom.xml under below tag.
 
-	<distributionManagement>
+<distributionManagement>
+	<repository>
+        <id>nexus</id>     --> any id name you can give
+        <name>Facebook Releases Nexus Repository</name>
+        <url>http://3.110.189.243:8082/rahul/repository/facebook-release/</url>
+      </repository>
 
-            <repository>
-              <id>nexus</id>     --> any id name you can give
-              <name>Rahul Technologies Releases Nexus Repository</name>
-              <url>http://3.110.189.243:8082/rahul/repository/facebook-release/</url>
-            </repository>
-
-            <snapshotRepository>
-              <id>nexus</id>      --> any id name you can give
-              <name>Rahul Technologies Snapshot Nexus Repository </name>
-              <url>http://3.110.189.243:8082/rahul/repository/facebook-shapshot/</url>
-            </snapshotRepository>
-
-	</distributionManagement>
+      <snapshotRepository>
+        <id>nexus</id>      --> any id name you can give
+        <name>Facebook Snapshot Nexus Repository </name>
+        <url>http://3.110.189.243:8082/rahul/repository/facebook-shapshot/</url>
+      </snapshotRepository>
+</distributionManagement>
 
 In Real-time we configure nexus credentional in settings.xml of mavan as follow.
 
 <servers>
-
 	<server>
 	  <id>nexus</id>   --> any id name you can give
 	  <username>admin</username>
         <password>Rahul@3738</password>
 	</server>
-
 </servers>
 
 
 Note : pom.xml id and settings.xml file id should be same.
 
-
 Now run # mvn clean deploy in /root/java-projects/maven-web-application to deploy artifact to nexus repository
-
 
 If you get 400 Repository does not allow updating assets Please check release version in pom.xml
 If you get 401 unauthorized error while deploy please check credentials in setting.xml
@@ -237,7 +225,8 @@ Do below changes in mh/conf/settings.xml
 
 maven2(proxy)
 -------------
-In real-time we do not download dependency directly from maven central to local.we download dependency from maven central to remote repository.
+In real-time we are not going to download dependency directly from maven central repository to local repository.
+We first download dependency from maven central repository to remote repository and from remote repository to local.
 For this purpose we create on maven2(proxy) remote repository in nexus server.
 
 Click on settings tab --> Click on Repository tab left hand side --> Click on Create repository button 
@@ -304,15 +293,22 @@ Note : In Real-time we configure group repository url only and add other reposit
 Nexus Admin Task
 ----------------
 Repository
+----------
+As a devops engineed we are resposible to create repository in nexus as per project requirement.
 
 Cleanup policy
-Cleanup policies can be used to remove content from your repositories
+--------------
+As a devops engineed we are resposible to create cleanup policy. Cleanup policies can be used to remove content from your repositories.
 We can create clean up policy and attach to repository of our choise.
 
-We can create rolls in security tab.
-Roles bring together multiple privileges so that, when you assign a user to the role, that user will automatically have all of those privileges
-We can create users and attche rolls to user in security tab.
+User and Rolls
+--------------
+As a devops engineed we are resposible to create users and rolls in security tab.
+Roles bring multiple privileges together so that, when you attached the role to the user, that user will automatically have all of those privileges
 
-LDAP : lightweight directory access protocol or AD : active directory
+LDAP OR AD 
+----------
+LDAP : Lightweight Directory Access Protocol
+AD : Active Directory
 LDAP or AD server contain employee informetion
-We can integrate LDAP or AD with SonarQube, Nexus and Jenkins so we no need to create user manually
+As a devops engineed we are resposible to integrate LDAP or AD with SonarQube, Nexus and Jenkins so we no need to create user manually.
