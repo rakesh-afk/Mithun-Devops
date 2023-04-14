@@ -1,0 +1,27 @@
+For building nodeJS project we need nodeJS tool just like we need maven build tool for java project.
+# yum install nodejs -y
+
+To create package 
+# npm install
+
+When we built a nodeJS project for the very first time. It will downloaded all dependencies from nodjs central repository or remote repository.
+It will create one folder called as node_module and store all downloaded dependancies in it.
+
+To execute sonarqube report
+# npm run sonar OR # node sonar-project.js
+
+Java - Maven Build Tool               Node Js
+----------------------                ------- 
+pom.xml                               package.json (Node Modules)
+
+mvn clean package                     npm install
+
+mvn clean sonar:sonar                 npm run sonar (OR) node sonar-project.js
+
+pom.xml                               sonar-project.js
+
+mvn deploy                            npm publish
+
+pom.xml --> nexus repos               package.json --> nexus repos
+
+settings.xml --> nexus credentilas    Create file .npmrc --> nexus credentials -- base64 
